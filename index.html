@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube iTabs Generator</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="Turn any YouTube video into a simple, shareable guide. Paste a transcript, get clickable iTabs in seconds.">
+    
+    <!-- Open Graph (LinkedIn, Facebook) -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="YouTube iTabs Generator">
+    <meta property="og:description" content="Turn any YouTube video into a simple, shareable guide. Paste a transcript, get clickable iTabs in seconds.">
+    <meta property="og:image" content="https://yourdomain.com/itabs-preview.png">
+    <meta property="og:url" content="https://yourdomain.com/youtube-itabs">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="YouTube iTabs Generator">
+    <meta name="twitter:description" content="Turn any YouTube video into a simple, shareable guide.">
+    <meta name="twitter:image" content="https://yourdomain.com/itabs-preview.png">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, sans-serif; background: #f5f5f5; min-height: 100vh; padding: 16px; }
+        
+        .container { max-width: 500px; margin: 0 auto; }
+        
+        .main-card { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+        
+        .header { text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eee; margin-bottom: 20px; }
+        .logo { display: inline-flex; align-items: center; gap: 10px; }
+        .logo-icon { width: 36px; height: 36px; background: #0066cc; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-style: italic; font-family: Georgia, serif; font-size: 18px; }
+        .logo-text { font-size: 1.3rem; font-weight: 700; color: #333; }
+        
+        .form-section { }
+        
+        label { display: block; font-weight: 600; margin-bottom: 6px; color: #333; font-size: 0.9rem; }
+        
+        input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem; font-family: inherit; margin-bottom: 16px; }
+        input:focus, textarea:focus { outline: none; border-color: #0066cc; }
+        textarea { height: 120px; resize: vertical; }
+        
+        .style-options { display: flex; gap: 8px; margin-bottom: 16px; }
+        .style-btn { flex: 1; padding: 12px 8px; border: 2px solid #ddd; border-radius: 8px; background: #fff; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: #555; transition: all 0.2s; }
+        .style-btn:hover { border-color: #0066cc; color: #0066cc; }
+        .style-btn.active { border-color: #0066cc; background: #e6f0ff; color: #0066cc; }
+        
+        .btn { width: 100%; padding: 14px; background: #0066cc; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .btn:hover { background: #0055aa; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        
+        .error { background: #fee; color: #c00; padding: 10px; border-radius: 8px; margin-bottom: 16px; font-size: 0.9rem; }
+        
+        .loading { text-align: center; padding: 40px; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #ddd; border-top-color: #0066cc; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .output { display: none; }
+        .output.show { display: block; }
+        
+        .output-buttons { display: flex; gap: 10px; margin-bottom: 16px; }
+        .output-buttons button { flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
+        .back-btn { background: #eee; border: none; color: #333; }
+        .copy-btn { background: #0066cc; border: none; color: #fff; }
+        
+        .preview-frame { width: 100%; height: 500px; border: 1px solid #ddd; border-radius: 8px; background: #fff; }
+        
+        .code-box { width: 100%; height: 150px; margin-top: 16px; padding: 12px; background: #1e1e1e; color: #4ec9b0; font-family: monospace; font-size: 0.75rem; border: none; border-radius: 8px; resize: vertical; }
+        
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-card">
+            <div class="header">
+                <div class="logo">
+                    <div class="logo-icon">i</div>
+                    <div class="logo-text">YouTube iTabs</div>
+                </div>
+            </div>
+
+            <div class="form-section" id="formCard">
+            <div class="error hidden" id="error"></div>
+            
+            <label>YouTube URL</label>
+            <input type="text" id="youtubeUrl" placeholder="https://youtube.com/watch?v=...">
+            
+            <label>Transcript</label>
+            <textarea id="transcript" placeholder="Paste the video transcript here..."></textarea>
+            
+            <label>Display Style</label>
+            <div class="style-options">
+                <button type="button" class="style-btn active" data-style="cards" onclick="selectStyle('cards')">📇 Cards</button>
+                <button type="button" class="style-btn" data-style="carousel" onclick="selectStyle('carousel')">📱 Carousel</button>
+                <button type="button" class="style-btn" data-style="list" onclick="selectStyle('list')">📋 List</button>
+            </div>
+            <input type="hidden" id="displayStyle" value="cards">
+            
+            <button class="btn" id="generateBtn" onclick="generate()">Generate iTabs</button>
+        </div>
+
+        <div class="loading hidden" id="loading">
+            <div class="spinner"></div>
+            <p>Generating your iTabs...</p>
+        </div>
+
+        <div class="output" id="output">
+            <div class="output-buttons">
+                <button class="back-btn" onclick="reset()">← Back</button>
+                <button class="copy-btn" onclick="copyCode()">Copy HTML</button>
+            </div>
+            <iframe class="preview-frame" id="preview"></iframe>
+            <textarea class="code-box" id="codeBox" readonly></textarea>
+        </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedStyle = 'cards';
+        
+        function selectStyle(style) {
+            selectedStyle = style;
+            document.getElementById('displayStyle').value = style;
+            document.querySelectorAll('.style-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.style === style);
+            });
+        }
+        
+        function extractVideoId(url) {
+            const match = url.match(/youtu\.be\/([^?&]+)/) || 
+                          url.match(/youtube\.com\/watch\?v=([^?&]+)/) || 
+                          url.match(/youtube\.com\/embed\/([^?&]+)/);
+            return match ? match[1] : null;
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('error');
+            el.textContent = msg;
+            el.classList.remove('hidden');
+        }
+
+        function hideError() {
+            document.getElementById('error').classList.add('hidden');
+        }
+
+        async function generate() {
+            hideError();
+            
+            const url = document.getElementById('youtubeUrl').value.trim();
+            const transcript = document.getElementById('transcript').value.trim();
+            
+            if (!url || !transcript) {
+                showError('Please enter both YouTube URL and transcript');
+                return;
+            }
+            
+            const videoId = extractVideoId(url);
+            if (!videoId) {
+                showError('Invalid YouTube URL');
+                return;
+            }
+            
+            document.getElementById('formCard').classList.add('hidden');
+            document.getElementById('loading').classList.remove('hidden');
+            
+            try {
+                const aiContent = await callAI(transcript);
+                const html = buildHtml(aiContent, videoId);
+                
+                document.getElementById('preview').srcdoc = html;
+                document.getElementById('codeBox').value = html;
+                
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('output').classList.add('show');
+            } catch (err) {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('formCard').classList.remove('hidden');
+                showError('Error: ' + err.message);
+            }
+        }
+
+        async function callAI(transcriptText) {
+            const prompt = `Extract 3-5 key takeaways from this transcript. For each, provide:
+- An emoji
+- A short title (3-5 words)
+- 1-2 "Yes" items (good practices)
+- 1-2 "No" items (things to avoid)
+- A detailed HTML-formatted info popup with:
+  - A bold title
+  - 2-3 sentences explaining why this matters
+  - A "Quick tip" with practical advice
+  - A "Learn more" search suggestion
+
+Respond ONLY in JSON:
+{
+  "title": "short title",
+  "steps": [
+    {
+      "emoji": "🍎",
+      "title": "Eat Whole Foods",
+      "yes": ["Vegetables", "Lean protein"],
+      "no": ["Processed snacks"],
+      "info": "<strong>Why it matters</strong><br><br>Whole foods provide essential nutrients that processed foods lack. Your body absorbs vitamins and minerals more efficiently from natural sources.<br><br><strong>Quick tip:</strong> Start with one whole food swap per week - replace chips with nuts or soda with water.<br><br><strong>Learn more:</strong> Search <em>whole food meal prep beginners</em>"
+    }
+  ]
+}
+
+Transcript:
+${transcriptText}`;
+
+            const response = await fetch('https://api.anthropic.com/v1/messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: 'claude-sonnet-4-20250514',
+                    max_tokens: 2000,
+                    messages: [{ role: 'user', content: prompt }]
+                })
+            });
+
+            if (!response.ok) throw new Error('API request failed');
+            const data = await response.json();
+            const text = data.content[0].text;
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            if (!jsonMatch) throw new Error('No JSON in response');
+            return JSON.parse(jsonMatch[0]);
+        }
+
+        function buildHtml(c, vid) {
+            let infos = JSON.stringify(c.steps.map(s => s.info));
+            
+            if (selectedStyle === 'cards') {
+                return buildCardsHtml(c, vid, infos);
+            } else if (selectedStyle === 'carousel') {
+                return buildCarouselHtml(c, vid, infos);
+            } else {
+                return buildListHtml(c, vid, infos);
+            }
+        }
+        
+        function buildCardsHtml(c, vid, infos) {
+            let stepsHtml = c.steps.map((s, i) => `
+    <div class="step-card">
+      <div class="card-header">
+        <span class="emoji">${s.emoji}</span>
+        <button class="i-btn" onclick="showInfo(${i})">i</button>
+      </div>
+      <div class="card-title">${s.title}</div>
+      <div class="card-items">
+        ${s.yes.map(y => `<div class="yes">✓ ${y}</div>`).join('')}
+        ${s.no.map(n => `<div class="no">✗ ${n}</div>`).join('')}
+      </div>
+    </div>`).join('');
+
+            return `<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>${c.title}</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, sans-serif; background: transparent; padding: 0; margin: 0; }
+.frame { max-width: 400px; margin: 0 auto; border: 2px solid #e0e0e0; border-radius: 16px; padding: 16px; background: #f9f9f9; }
+h1 { font-size: 1.1rem; margin-bottom: 16px; color: #333; text-align: center; }
+.cards-grid { display: flex; flex-direction: column; gap: 12px; }
+.step-card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.emoji { font-size: 1.5rem; }
+.card-title { font-weight: 700; color: #333; font-size: 1rem; margin-bottom: 10px; }
+.card-items { }
+.yes { color: #228822; font-size: 0.9rem; margin: 4px 0; }
+.no { color: #aa2222; font-size: 0.9rem; margin: 4px 0; }
+.i-btn { width: 26px; height: 26px; background: #0066cc; color: #fff; border: none; border-radius: 50%; font-size: 13px; font-style: italic; font-family: Georgia, serif; cursor: pointer; }
+.video-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.video-card iframe { width: 100%; aspect-ratio: 16/9; border: none; display: block; }
+.badge { text-align: center; margin-top: 12px; font-size: 0.75rem; color: #999; cursor: pointer; display: flex; align-items: center; gap: 6px; justify-content: center; padding: 8px; }
+.popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); width: calc(100% - 40px); max-width: 320px; max-height: 80vh; overflow-y: auto; z-index: 100; }
+.popup.show { display: block; }
+.popup p { font-size: 0.9rem; line-height: 1.6; color: #333; } .popup strong { color: #0066cc; } .popup a { color: #0066cc; text-decoration: none; }
+.overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+.overlay.show { display: block; }
+.popup-close { float: right; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; }
+</style>
+</head>
+<body>
+<div class="frame">
+<h1>${c.title}</h1>
+<div class="cards-grid">
+${stepsHtml}
+<div class="video-card">
+<iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen></iframe>
+</div>
+</div>
+<div class="badge" onclick="showItabsInfo()">
+<span class="i-btn" style="width:16px;height:16px;font-size:9px">i</span>
+Made with iTabs
+</div>
+</div>
+<div class="overlay" id="overlay" onclick="hideInfo()"></div>
+<div class="popup" id="popup">
+<button class="popup-close" onclick="hideInfo()">×</button>
+<p id="popup-text"></p>
+</div>
+<script>
+var infos = ${infos};
+var itabsInfo = "<strong>What is iTabs?</strong><br><br>iTabs transforms complex information into simple, interactive guides you can share anywhere.<br><br>✓ Created from YouTube videos in seconds<br>✓ Mobile-friendly design<br>✓ Clickable info buttons for deeper learning<br><br><a href=\x27https://itabs.ai\x27 target=\x27_blank\x27 style=\x27color:#0066cc\x27>Learn more at itabs.ai →</a>";
+function showInfo(i) { document.getElementById('popup-text').innerHTML = infos[i]; document.getElementById('popup').classList.add('show'); document.getElementById('overlay').classList.add('show'); }
+function showItabsInfo() { document.getElementById('popup-text').innerHTML = itabsInfo; document.getElementById('popup').classList.add('show'); document.getElementById('overlay').classList.add('show'); }
+function hideInfo() { document.getElementById('popup').classList.remove('show'); document.getElementById('overlay').classList.remove('show'); }
+<\/script>
+</body></html>`;
+        }
+        
+        function buildCarouselHtml(c, vid, infos) {
+            let stepsHtml = c.steps.map((s, i) => `
+    <div class="slide">
+      <div class="slide-emoji">${s.emoji}</div>
+      <div class="slide-title">${s.title}</div>
+      <div class="slide-items">
+        ${s.yes.map(y => `<div class="yes">✓ ${y}</div>`).join('')}
+        ${s.no.map(n => `<div class="no">✗ ${n}</div>`).join('')}
+      </div>
+      <button class="i-btn" onclick="showInfo(${i})">i</button>
+    </div>`).join('');
+
+            return `<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>${c.title}</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, sans-serif; background: transparent; padding: 0; margin: 0; }
+.frame { max-width: 400px; margin: 0 auto; border: 2px solid #e0e0e0; border-radius: 16px; padding: 16px; background: #f9f9f9; }
+h1 { font-size: 1.1rem; margin-bottom: 12px; color: #333; text-align: center; }
+.carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; padding: 4px; -webkit-overflow-scrolling: touch; }
+.carousel::-webkit-scrollbar { display: none; }
+.slide { flex: 0 0 85%; scroll-snap-align: center; background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; position: relative; }
+.slide-emoji { font-size: 2.5rem; margin-bottom: 12px; }
+.slide-title { font-weight: 700; font-size: 1.1rem; color: #333; margin-bottom: 16px; }
+.slide-items { text-align: left; }
+.yes { color: #228822; font-size: 0.95rem; margin: 6px 0; }
+.no { color: #aa2222; font-size: 0.95rem; margin: 6px 0; }
+.i-btn { position: absolute; top: 16px; right: 16px; width: 28px; height: 28px; background: #0066cc; color: #fff; border: none; border-radius: 50%; font-size: 14px; font-style: italic; font-family: Georgia, serif; cursor: pointer; }
+.dots { display: flex; justify-content: center; gap: 8px; margin: 16px 0; }
+.dot { width: 8px; height: 8px; background: #ccc; border-radius: 50%; }
+.dot.active { background: #0066cc; }
+.video-wrap { border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.video-wrap iframe { width: 100%; aspect-ratio: 16/9; border: none; display: block; }
+.badge { text-align: center; margin-top: 12px; font-size: 0.75rem; color: #999; cursor: pointer; display: flex; align-items: center; gap: 6px; justify-content: center; padding: 8px; }
+.popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); width: calc(100% - 40px); max-width: 320px; max-height: 80vh; overflow-y: auto; z-index: 100; }
+.popup.show { display: block; }
+.popup p { font-size: 0.9rem; line-height: 1.6; color: #333; } .popup strong { color: #0066cc; } .popup a { color: #0066cc; text-decoration: none; }
+.overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+.overlay.show { display: block; }
+.popup-close { float: right; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; }
+.swipe-hint { text-align: center; color: #999; font-size: 0.8rem; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<div class="frame">
+<h1>${c.title}</h1>
+<p class="swipe-hint">← Swipe to explore →</p>
+<div class="carousel" id="carousel">
+${stepsHtml}
+</div>
+<div class="dots" id="dots"></div>
+<div class="video-wrap">
+<iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen></iframe>
+</div>
+<div class="badge" onclick="showItabsInfo()">
+<span class="i-btn" style="width:16px;height:16px;font-size:9px">i</span>
+Made with iTabs
+</div>
+</div>
+<div class="overlay" id="overlay" onclick="hideInfo()"></div>
+<div class="popup" id="popup">
+<button class="popup-close" onclick="hideInfo()">×</button>
+<p id="popup-text"></p>
+</div>
+<script>
+var infos = ${infos};
+var itabsInfo = "<strong>What is iTabs?</strong><br><br>iTabs transforms complex information into simple, interactive guides you can share anywhere.<br><br>✓ Created from YouTube videos in seconds<br>✓ Mobile-friendly design<br>✓ Clickable info buttons for deeper learning<br><br><a href=\x27https://itabs.ai\x27 target=\x27_blank\x27 style=\x27color:#0066cc\x27>Learn more at itabs.ai →</a>";
+function showInfo(i) { document.getElementById('popup-text').innerHTML = infos[i]; document.getElementById('popup').classList.add('show'); document.getElementById('overlay').classList.add('show'); }
+function showItabsInfo() { document.getElementById('popup-text').innerHTML = itabsInfo; document.getElementById('popup').classList.add('show'); document.getElementById('overlay').classList.add('show'); }
+function hideInfo() { document.getElementById('popup').classList.remove('show'); document.getElementById('overlay').classList.remove('show'); }
+// Dots
+var slides = document.querySelectorAll('.slide');
+var dotsEl = document.getElementById('dots');
+slides.forEach((_, i) => { var d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); dotsEl.appendChild(d); });
+document.getElementById('carousel').addEventListener('scroll', function() {
+  var idx = Math.round(this.scrollLeft / this.offsetWidth);
+  document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+});
+<\/script>
+</body></html>`;
+        }
+        
+        function buildListHtml(c, vid, infos) {
+            let stepsHtml = c.steps.map((s, i) => `
+    <div class="step">
+      <div class="step-header">
+        <span class="emoji">${s.emoji}</span>
+        <span class="title">${s.title}</span>
+        <button class="i-btn" onclick="showInfo(${i})">i</button>
+      </div>
+      <div class="items">
+        ${s.yes.map(y => `<div class="yes">✓ ${y}</div>`).join('')}
+        ${s.no.map(n => `<div class="no">✗ ${n}</div>`).join('')}
+      </div>
+    </div>`).join('');
+
+            return `<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>${c.title}</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, sans-serif; background: transparent; padding: 0; margin: 0; }
+.frame { max-width: 400px; margin: 0 auto; border: 2px solid #e0e0e0; border-radius: 16px; padding: 16px; background: #f9f9f9; }
+.card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+h1 { font-size: 1.1rem; margin-bottom: 12px; color: #333; }
+.step { padding: 10px 0; border-bottom: 1px solid #eee; }
+.step:last-child { border-bottom: none; }
+.step-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.emoji { font-size: 1.1rem; flex-shrink: 0; }
+.title { font-weight: 600; color: #333; flex: 1; font-size: 0.95rem; line-height: 1.3; }
+.i-btn { width: 24px; height: 24px; min-width: 24px; background: #0066cc; color: #fff; border: none; border-radius: 50%; font-size: 12px; font-style: italic; font-family: Georgia, serif; cursor: pointer; }
+.items { padding-left: 28px; }
+.yes { color: #228822; font-size: 0.85rem; margin: 3px 0; }
+.no { color: #aa2222; font-size: 0.85rem; margin: 3px 0; }
+.video { margin-top: 12px; border-radius: 8px; overflow: hidden; }
+.video iframe { width: 100%; aspect-ratio: 16/9; border: none; display: block; }
+.badge { text-align: center; margin-top: 12px; font-size: 0.75rem; color: #999; cursor: pointer; display: flex; align-items: center; gap: 6px; justify-content: center; padding: 8px; }
+.popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); width: calc(100% - 40px); max-width: 320px; max-height: 80vh; overflow-y: auto; z-index: 100; }
+.popup.show { display: block; }
+.popup p { font-size: 0.9rem; line-height: 1.6; color: #333; } .popup strong { color: #0066cc; } .popup a { color: #0066cc; text-decoration: none; }
+.overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+.overlay.show { display: block; }
+.popup-close { float: right; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; }
+</style>
+</head>
+<body>
+<div class="frame">
+<div class="card">
+<h1>${c.title}</h1>
+${stepsHtml}
+<div class="video">
+<iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen></iframe>
+</div>
+<div class="badge" onclick="showItabsInfo()">
+<span class="i-btn" style="width:16px;height:16px;font-size:9px">i</span>
+Made with iTabs
+</div>
+</div>
+</div>
+<div class="overlay" id="overlay" onclick="hideInfo()"></div>
+<div class="popup" id="popup">
+<button class="popup-close" onclick="hideInfo()">×</button>
+<p id="popup-text"></p>
+</div>
+<script>
+var infos = ${infos};
+var itabsInfo = "<strong>What is iTabs?</strong><br><br>iTabs transforms complex information into simple, interactive guides you can share anywhere.<br><br>✓ Created from YouTube videos in seconds<br>✓ Mobile-friendly design<br>✓ Clickable info buttons for deeper learning<br><br><a href=\x27https://itabs.ai\x27 target=\x27_blank\x27 style=\x27color:#0066cc\x27>Learn more at itabs.ai →</a>";
+function showInfo(i) { document.getElementById('popup-text').innerHTML = infos[i]; document.getElementById('popup').classList.add('show'); document.getElementById('overlay').classList.add('show'); }
+function showItabsInfo() { document.getElementById('popup-text').innerHTML = itabsInfo; document.getElementById('popup').classList.add('show'); document.getElementById('overlay').classList.add('show'); }
+function hideInfo() { document.getElementById('popup').classList.remove('show'); document.getElementById('overlay').classList.remove('show'); }
+<\/script>
+</body></html>`;
+        }
+
+        function reset() {
+            document.getElementById('output').classList.remove('show');
+            document.getElementById('formCard').classList.remove('hidden');
+        }
+
+        function copyCode() {
+            const code = document.getElementById('codeBox').value;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = '✓ Copied!';
+                setTimeout(() => btn.textContent = 'Copy HTML', 2000);
+            });
+        }
+    </script>
+</body>
+</html>
