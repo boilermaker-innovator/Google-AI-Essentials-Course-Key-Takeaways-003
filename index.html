@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Google AI Essentials Course</title>
+<meta name="description" content="Google AI Essentials Course - Interactive guide with clickable explanations. Made with iTabs.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Google AI Essentials Course">
+<meta property="og:description" content="Swipeable interactive guide with clickable explanations. Tap the i buttons to learn more.">
+<meta property="og:image" content="https://img.youtube.com/vi/nVyD6THcvDQ/maxresdefault.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Google AI Essentials Course">
+<meta name="twitter:description" content="Interactive guide made with iTabs.">
+<meta name="twitter:image" content="https://img.youtube.com/vi/nVyD6THcvDQ/maxresdefault.jpg">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,sans-serif;background:transparent;margin:0;padding:0}
+.frame{max-width:400px;margin:0 auto;border:2px solid #e0e0e0;border-radius:16px;padding:16px;background:#f9f9f9}
+h1{font-size:1.1rem;margin-bottom:8px;color:#333;text-align:center}
+.hint{text-align:center;color:#999;font-size:0.8rem;margin-bottom:12px}
+.carousel{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.carousel::-webkit-scrollbar{display:none}
+.slide{flex:0 0 85%;scroll-snap-align:center;background:#fff;border-radius:16px;padding:24px;box-shadow:0 4px 12px rgba(0,0,0,0.1);text-align:center;position:relative}
+.slide-emoji{font-size:2.8rem;margin-bottom:14px}
+.slide-title{font-weight:700;font-size:1.1rem;color:#333;margin-bottom:16px}
+.slide-items{text-align:left;padding:0 8px}
+.yes{color:#228822;font-size:0.95rem;margin:6px 0}
+.no{color:#cc2222;font-size:0.95rem;margin:6px 0}
+.i-btn{position:absolute;top:16px;right:16px;width:30px;height:30px;background:#0066cc;color:#fff;border:none;border-radius:50%;font-size:15px;font-style:italic;font-family:Georgia,serif;cursor:pointer}
+.dots{display:flex;justify-content:center;gap:8px;margin:14px 0}
+.dot{width:8px;height:8px;background:#ccc;border-radius:50%;transition:background 0.2s}
+.dot.active{background:#0066cc}
+.video{border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+.video iframe{width:100%;aspect-ratio:16/9;border:none;display:block}
+.badge{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;padding:10px;font-size:0.8rem;color:#888;cursor:pointer}
+.badge .i-btn{width:18px;height:18px;font-size:10px;position:static}
+.overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:99}
+.overlay.show{display:block}
+.popup{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:24px;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.3);width:calc(100% - 48px);max-width:320px;max-height:75vh;overflow-y:auto;z-index:100}
+.popup.show{display:block}
+.popup-close{position:absolute;top:12px;right:12px;width:32px;height:32px;background:#f0f0f0;border:none;border-radius:50%;font-size:1.3rem;color:#666;cursor:pointer}
+.popup-content{font-size:0.95rem;line-height:1.7;color:#333}
+.popup-content strong{color:#0066cc;display:block;margin-top:12px}
+.popup-content strong:first-child{margin-top:0}
+.popup-content em{color:#0066cc}
+.popup-content a{color:#0066cc}
+</style>
+</head>
+<body>
+<div class="frame">
+<h1>Google AI Essentials Course</h1>
+<p class="hint">← Swipe to explore →</p>
+<div class="carousel" id="carousel">
+
+                <div class="slide">
+                    <div class="slide-emoji">🔧</div>
+                    <div class="slide-title">Know Three AI Types</div>
+                    <div class="slide-items">
+                        <div class="yes">✓ Understand standalone tools</div><div class="yes">✓ Learn integrated features</div>
+                        <div class="no">✗ Assume custom AI is too technical</div><div class="no">✗ Use wrong tool type</div>
+                    </div>
+                    <button class="i-btn" onclick="showInfo(0)">i</button>
+                </div>
+            
+                <div class="slide">
+                    <div class="slide-emoji">🎯</div>
+                    <div class="slide-title">Surface Implied Context</div>
+                    <div class="slide-items">
+                        <div class="yes">✓ Include background information</div><div class="yes">✓ State assumptions explicitly</div>
+                        <div class="no">✗ Assume AI knows your context</div><div class="no">✗ Leave out relevant details</div>
+                    </div>
+                    <button class="i-btn" onclick="showInfo(1)">i</button>
+                </div>
+            
+                <div class="slide">
+                    <div class="slide-emoji">📝</div>
+                    <div class="slide-title">Use Example-Based Prompting</div>
+                    <div class="slide-items">
+                        <div class="yes">✓ Provide relevant examples</div><div class="yes">✓ Use few-shot for complex tasks</div>
+                        <div class="no">✗ Expect good results without examples</div><div class="no">✗ Use irrelevant sample outputs</div>
+                    </div>
+                    <button class="i-btn" onclick="showInfo(2)">i</button>
+                </div>
+            
+                <div class="slide">
+                    <div class="slide-emoji">🔗</div>
+                    <div class="slide-title">Break Down Complex Tasks</div>
+                    <div class="slide-items">
+                        <div class="yes">✓ Divide large tasks into steps</div><div class="yes">✓ Iterate and refine each part</div>
+                        <div class="no">✗ Request entire deliverables at once</div><div class="no">✗ Skip intermediate steps</div>
+                    </div>
+                    <button class="i-btn" onclick="showInfo(3)">i</button>
+                </div>
+            
+                <div class="slide">
+                    <div class="slide-emoji">⚠️</div>
+                    <div class="slide-title">Understand AI Limitations</div>
+                    <div class="slide-items">
+                        <div class="yes">✓ Verify important information</div><div class="yes">✓ Check for bias in outputs</div>
+                        <div class="no">✗ Trust AI completely for high-stakes decisions</div><div class="no">✗ Ignore knowledge cutoff dates</div>
+                    </div>
+                    <button class="i-btn" onclick="showInfo(4)">i</button>
+                </div>
+            
+</div>
+<div class="dots" id="dots"></div>
+<div class="video">
+<iframe src="https://www.youtube.com/embed/nVyD6THcvDQ" allowfullscreen></iframe>
+</div>
+<div class="badge" onclick="showItabs()">
+<span class="i-btn">i</span>
+<span>Made with iTabs</span>
+</div>
+</div>
+<div class="overlay" id="overlay" onclick="hideInfo()"></div>
+<div class="popup" id="popup">
+<button class="popup-close" onclick="hideInfo()">×</button>
+<div class="popup-content" id="popupContent"></div>
+</div>
+<script>
+var infos=["<strong>Choose the Right AI Tool Type</strong><br><br>Understanding the three AI categories (standalone, integrated, and custom) helps you select the most efficient solution for your task. Each type serves different purposes and requires different approaches.<br><br><strong>Quick tip:</strong> Start with standalone tools like ChatGPT for general tasks, then explore integrated features in your existing software.<br><br><strong>Learn more:</strong> Search <em>AI tool categories comparison</em>","<strong>Provide Complete Context for Better AI Results</strong><br><br>AI tools don't know your background, industry, or personal situation unless you explicitly tell them. Including implied context dramatically improves output quality and relevance.<br><br><strong>Quick tip:</strong> Before prompting, list 3-5 key details about your situation that might affect the response.<br><br><strong>Learn more:</strong> Search <em>AI prompt context engineering</em>","<strong>Examples Guide AI to Better Outputs</strong><br><br>Zero-shot (no examples) works for simple tasks, but few-shot prompting (2+ examples) dramatically improves results for complex or specific requests. Quality examples lead to quality outputs.<br><br><strong>Quick tip:</strong> Include 2-3 examples of your desired output format or style when asking for complex content.<br><br><strong>Learn more:</strong> Search <em>few-shot prompting techniques</em>","<strong>Chain-of-Thought Improves AI Accuracy</strong><br><br>Breaking complex tasks into manageable steps helps AI produce more accurate and consistent results. This approach works better than asking for complete deliverables in one prompt.<br><br><strong>Quick tip:</strong> For any task taking more than 5 minutes, break it into 3-5 smaller steps and tackle them sequentially.<br><br><strong>Learn more:</strong> Search <em>chain of thought prompting examples</em>","<strong>AI Has Important Limitations to Consider</strong><br><br>AI can have biased training data, lack recent information, and produce hallucinations (factually incorrect outputs). Understanding these limitations helps you use AI more effectively and safely.<br><br><strong>Quick tip:</strong> Always fact-check AI responses for important decisions, especially health, finance, or legal matters.<br><br><strong>Learn more:</strong> Search <em>AI hallucinations bias verification</em>"];
+var itabsInfo="<strong>What is iTabs?</strong><br><br>iTabs transforms complex information into simple, interactive guides you can share anywhere.<br><br>✓ Created from YouTube videos in seconds<br>✓ Mobile-friendly design<br>✓ Clickable info buttons for deeper learning<br><br><a href='https://itabs.ai' target='_blank'>Learn more at itabs.ai →</a>";
+function showInfo(i){document.getElementById('popupContent').innerHTML=infos[i];document.getElementById('popup').classList.add('show');document.getElementById('overlay').classList.add('show')}
+function showItabs(){document.getElementById('popupContent').innerHTML=itabsInfo;document.getElementById('popup').classList.add('show');document.getElementById('overlay').classList.add('show')}
+function hideInfo(){document.getElementById('popup').classList.remove('show');document.getElementById('overlay').classList.remove('show')}
+var slides=document.querySelectorAll('.slide');
+var dotsEl=document.getElementById('dots');
+slides.forEach(function(_,i){var d=document.createElement('div');d.className='dot'+(i===0?' active':'');dotsEl.appendChild(d)});
+document.getElementById('carousel').addEventListener('scroll',function(){var idx=Math.round(this.scrollLeft/this.offsetWidth);document.querySelectorAll('.dot').forEach(function(d,i){d.classList.toggle('active',i===idx)})});
+</script>
+</body></html>
