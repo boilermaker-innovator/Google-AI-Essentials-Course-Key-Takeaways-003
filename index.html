@@ -1,537 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube iTabs Generator</title>
-    
-    <!-- SEO & Social -->
-    <meta name="description" content="Turn any YouTube video into a simple, shareable interactive guide.">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="YouTube iTabs Generator">
-    <meta property="og:description" content="Turn any YouTube video into a simple, shareable guide. Paste a transcript, get clickable iTabs in seconds.">
-    <meta property="og:image" content="https://yourdomain.com/preview.png">
-    <meta name="twitter:card" content="summary_large_image">
-    
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f0f2f5;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 480px;
-            margin: 0 auto;
-        }
-        
-        /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .logo {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: #0066cc;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-style: italic;
-            font-family: Georgia, serif;
-            font-size: 20px;
-        }
-        
-        .logo-text {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #1a1a1a;
-        }
-        
-        /* Card */
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-        }
-        
-        /* Form */
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #333;
-            margin-bottom: 8px;
-        }
-        
-        input[type="text"], textarea {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-family: inherit;
-            transition: border-color 0.2s;
-        }
-        
-        input[type="text"]:focus, textarea:focus {
-            outline: none;
-            border-color: #0066cc;
-        }
-        
-        textarea {
-            height: 140px;
-            resize: vertical;
-        }
-        
-        /* Style Selector */
-        .style-selector {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .style-btn {
-            flex: 1;
-            padding: 12px 8px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            background: white;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #666;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .style-btn:hover {
-            border-color: #0066cc;
-            color: #0066cc;
-        }
-        
-        .style-btn.active {
-            border-color: #0066cc;
-            background: #e8f2ff;
-            color: #0066cc;
-        }
-        
-        /* Button */
-        .btn {
-            width: 100%;
-            padding: 16px;
-            background: #0066cc;
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        
-        .btn:hover {
-            background: #0052a3;
-        }
-        
-        .btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-        
-        .btn-secondary {
-            background: #f0f0f0;
-            color: #333;
-        }
-        
-        .btn-secondary:hover {
-            background: #e0e0e0;
-        }
-        
-        /* Error */
-        .error {
-            background: #fff0f0;
-            border: 1px solid #ffcccc;
-            color: #cc0000;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            margin-bottom: 16px;
-        }
-        
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 60px 20px;
-        }
-        
-        .spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid #e0e0e0;
-            border-top-color: #0066cc;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .loading-text {
-            color: #666;
-            font-size: 1rem;
-        }
-        
-        /* Output */
-        .output-actions {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-        
-        .output-actions .btn {
-            flex: 1;
-            padding: 12px;
-            font-size: 0.9rem;
-        }
-        
-        .preview-frame {
-            width: 100%;
-            height: 520px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            background: white;
-        }
-        
-        .code-box {
-            width: 100%;
-            height: 160px;
-            margin-top: 16px;
-            padding: 14px;
-            background: #1a1a2e;
-            border: none;
-            border-radius: 10px;
-            color: #4ade80;
-            font-family: 'Monaco', 'Menlo', monospace;
-            font-size: 0.75rem;
-            resize: vertical;
-        }
-        
-        /* Utilities */
-        .hidden { display: none !important; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">
-                <div class="logo-icon">i</div>
-                <div class="logo-text">YouTube iTabs</div>
-            </div>
-        </div>
-        
-        <!-- Form -->
-        <div class="card" id="formSection">
-            <div id="errorBox" class="error hidden"></div>
-            
-            <div class="form-group">
-                <label>YouTube URL</label>
-                <input type="text" id="youtubeUrl" placeholder="https://youtube.com/watch?v=...">
-            </div>
-            
-            <div class="form-group">
-                <label>Transcript</label>
-                <textarea id="transcript" placeholder="Paste the video transcript here..."></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label>Display Style</label>
-                <div class="style-selector">
-                    <button type="button" class="style-btn active" data-style="cards" onclick="setStyle('cards')">📇 Cards</button>
-                    <button type="button" class="style-btn" data-style="carousel" onclick="setStyle('carousel')">📱 Carousel</button>
-                    <button type="button" class="style-btn" data-style="list" onclick="setStyle('list')">📋 List</button>
-                </div>
-            </div>
-            
-            <button class="btn" onclick="generate()">Generate iTabs</button>
-        </div>
-        
-        <!-- Loading -->
-        <div class="card hidden" id="loadingSection">
-            <div class="loading">
-                <div class="spinner"></div>
-                <p class="loading-text">Creating your iTabs...</p>
-            </div>
-        </div>
-        
-        <!-- Output -->
-        <div class="card hidden" id="outputSection">
-            <div class="output-actions">
-                <button class="btn btn-secondary" onclick="reset()">← Back</button>
-                <button class="btn" onclick="copyCode()">Copy HTML</button>
-            </div>
-            <iframe class="preview-frame" id="preview"></iframe>
-            <textarea class="code-box" id="codeBox" readonly></textarea>
-        </div>
-    </div>
-
-    <script>
-        let selectedStyle = 'cards';
-        
-        // Style selector
-        function setStyle(style) {
-            selectedStyle = style;
-            document.querySelectorAll('.style-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.style === style);
-            });
-        }
-        
-        // Extract YouTube video ID
-        function getVideoId(url) {
-            const patterns = [
-                /youtu\.be\/([^?&#]+)/,
-                /youtube\.com\/watch\?v=([^?&#]+)/,
-                /youtube\.com\/embed\/([^?&#]+)/
-            ];
-            for (const pattern of patterns) {
-                const match = url.match(pattern);
-                if (match) return match[1];
-            }
-            return null;
-        }
-        
-        // Show/hide sections
-        function showSection(sectionId) {
-            ['formSection', 'loadingSection', 'outputSection'].forEach(id => {
-                document.getElementById(id).classList.toggle('hidden', id !== sectionId);
-            });
-        }
-        
-        // Error handling
-        function showError(message) {
-            const box = document.getElementById('errorBox');
-            box.textContent = message;
-            box.classList.remove('hidden');
-        }
-        
-        function hideError() {
-            document.getElementById('errorBox').classList.add('hidden');
-        }
-        
-        // Generate iTabs
-        async function generate() {
-            hideError();
-            
-            const url = document.getElementById('youtubeUrl').value.trim();
-            const transcript = document.getElementById('transcript').value.trim();
-            
-            if (!url || !transcript) {
-                showError('Please enter both YouTube URL and transcript');
-                return;
-            }
-            
-            const videoId = getVideoId(url);
-            if (!videoId) {
-                showError('Invalid YouTube URL');
-                return;
-            }
-            
-            showSection('loadingSection');
-            
-            try {
-                const content = await callAI(transcript);
-                const html = buildOutput(content, videoId);
-                
-                document.getElementById('preview').srcdoc = html;
-                document.getElementById('codeBox').value = html;
-                
-                showSection('outputSection');
-            } catch (err) {
-                showSection('formSection');
-                showError('Error: ' + err.message);
-            }
-        }
-        
-        // Call AI API
-        async function callAI(transcript) {
-            const prompt = `Extract 3-5 key takeaways from this transcript. For each, provide:
-- An emoji
-- A short title (3-5 words)
-- 1-2 "Yes" items (good practices)
-- 1-2 "No" items (things to avoid)
-- A detailed HTML-formatted info popup with:
-  - A bold title
-  - 2-3 sentences explaining why this matters
-  - A "Quick tip" with practical advice
-  - A "Learn more" search suggestion
-
-Respond ONLY in JSON:
-{
-  "title": "short title",
-  "steps": [
-    {
-      "emoji": "🍎",
-      "title": "Eat Whole Foods",
-      "yes": ["Vegetables", "Lean protein"],
-      "no": ["Processed snacks"],
-      "info": "<strong>Why it matters</strong><br><br>Whole foods provide essential nutrients. Your body absorbs them more efficiently.<br><br><strong>Quick tip:</strong> Swap one processed snack for a whole food this week.<br><br><strong>Learn more:</strong> Search <em>whole food meal prep</em>"
-    }
-  ]
-}
-
-Transcript:
-${transcript}`;
-
-            const response = await fetch('https://api.anthropic.com/v1/messages', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: 'claude-sonnet-4-20250514',
-                    max_tokens: 2500,
-                    messages: [{ role: 'user', content: prompt }]
-                })
-            });
-
-            if (!response.ok) throw new Error('API request failed');
-            
-            const data = await response.json();
-            const text = data.content[0].text;
-            const match = text.match(/\{[\s\S]*\}/);
-            if (!match) throw new Error('Invalid response format');
-            
-            return JSON.parse(match[0]);
-        }
-        
-        // Build output HTML based on selected style
-        function buildOutput(content, videoId) {
-            const infos = JSON.stringify(content.steps.map(s => s.info));
-            
-            const styles = {
-                cards: buildCardsStyle,
-                carousel: buildCarouselStyle,
-                list: buildListStyle
-            };
-            
-            return styles[selectedStyle](content, videoId, infos);
-        }
-        
-        // Cards Style
-        function buildCardsStyle(c, vid, infos) {
-            const steps = c.steps.map((s, i) => `
-                <div class="step-card">
-                    <div class="card-top">
-                        <span class="emoji">${s.emoji}</span>
-                        <button class="i-btn" onclick="showInfo(${i})">i</button>
-                    </div>
-                    <div class="card-title">${s.title}</div>
-                    <div class="card-items">
-                        ${s.yes.map(y => `<div class="yes">✓ ${y}</div>`).join('')}
-                        ${s.no.map(n => `<div class="no">✗ ${n}</div>`).join('')}
-                    </div>
-                </div>
-            `).join('');
-
-            return `<!DOCTYPE html>
 <html><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>${c.title}</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,sans-serif;background:transparent;margin:0;padding:0}
-.frame{max-width:400px;margin:0 auto;border:2px solid #e0e0e0;border-radius:16px;padding:16px;background:#f9f9f9}
-h1{font-size:1.1rem;margin-bottom:16px;color:#333;text-align:center}
-.cards{display:flex;flex-direction:column;gap:12px}
-.step-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
-.card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.emoji{font-size:1.6rem}
-.card-title{font-weight:700;color:#333;font-size:1rem;margin-bottom:12px}
-.card-items{}
-.yes{color:#228822;font-size:0.9rem;margin:5px 0}
-.no{color:#cc2222;font-size:0.9rem;margin:5px 0}
-.i-btn{width:28px;height:28px;background:#0066cc;color:#fff;border:none;border-radius:50%;font-size:14px;font-style:italic;font-family:Georgia,serif;cursor:pointer}
-.video{border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
-.video iframe{width:100%;aspect-ratio:16/9;border:none;display:block}
-.badge{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;padding:10px;font-size:0.8rem;color:#888;cursor:pointer}
-.badge .i-btn{width:18px;height:18px;font-size:10px}
-.overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:99}
-.overlay.show{display:block}
-.popup{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:24px;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.3);width:calc(100% - 48px);max-width:320px;max-height:75vh;overflow-y:auto;z-index:100}
-.popup.show{display:block}
-.popup-close{position:absolute;top:12px;right:12px;width:32px;height:32px;background:#f0f0f0;border:none;border-radius:50%;font-size:1.3rem;color:#666;cursor:pointer}
-.popup-content{font-size:0.95rem;line-height:1.7;color:#333}
-.popup-content strong{color:#0066cc;display:block;margin-top:12px}
-.popup-content strong:first-child{margin-top:0}
-.popup-content em{color:#0066cc}
-.popup-content a{color:#0066cc}
-</style>
-</head>
-<body>
-<div class="frame">
-<h1>${c.title}</h1>
-<div class="cards">
-${steps}
-<div class="video">
-<iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen></iframe>
-</div>
-</div>
-<div class="badge" onclick="showItabs()">
-<span class="i-btn">i</span>
-<span>Made with iTabs</span>
-</div>
-</div>
-<div class="overlay" id="overlay" onclick="hideInfo()"></div>
-<div class="popup" id="popup">
-<button class="popup-close" onclick="hideInfo()">×</button>
-<div class="popup-content" id="popupContent"></div>
-</div>
-<script>
-var infos=${infos};
-var itabsInfo="<strong>What is iTabs?</strong><br><br>iTabs transforms complex information into simple, interactive guides you can share anywhere.<br><br>✓ Created from YouTube videos in seconds<br>✓ Mobile-friendly design<br>✓ Clickable info buttons for deeper learning<br><br><a href='https://itabs.ai' target='_blank'>Learn more at itabs.ai →</a>";
-function showInfo(i){document.getElementById('popupContent').innerHTML=infos[i];document.getElementById('popup').classList.add('show');document.getElementById('overlay').classList.add('show')}
-function showItabs(){document.getElementById('popupContent').innerHTML=itabsInfo;document.getElementById('popup').classList.add('show');document.getElementById('overlay').classList.add('show')}
-function hideInfo(){document.getElementById('popup').classList.remove('show');document.getElementById('overlay').classList.remove('show')}
-<\/script>
-</body></html>`;
-        }
-        
-        // Carousel Style
-        function buildCarouselStyle(c, vid, infos) {
-            const slides = c.steps.map((s, i) => `
-                <div class="slide">
-                    <div class="slide-emoji">${s.emoji}</div>
-                    <div class="slide-title">${s.title}</div>
-                    <div class="slide-items">
-                        ${s.yes.map(y => `<div class="yes">✓ ${y}</div>`).join('')}
-                        ${s.no.map(n => `<div class="no">✗ ${n}</div>`).join('')}
-                    </div>
-                    <button class="i-btn" onclick="showInfo(${i})">i</button>
-                </div>
-            `).join('');
-
-            return `<!DOCTYPE html>
-<html><head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>${c.title}</title>
+<title>Google AI Essentials Insights</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,sans-serif;background:transparent;margin:0;padding:0}
@@ -568,14 +39,64 @@ h1{font-size:1.1rem;margin-bottom:8px;color:#333;text-align:center}
 </head>
 <body>
 <div class="frame">
-<h1>${c.title}</h1>
+<h1>Google AI Essentials Insights</h1>
 <p class="hint">← Swipe to explore →</p>
 <div class="carousel" id="carousel">
-${slides}
+
+                <div class="slide">
+                    <div class="slide-emoji">🛠️</div>
+                    <div class="slide-title">Know Three AI Types</div>
+                    <div class="slide-items">
+                        <div class="yes">✓ Choose standalone tools for flexibility</div><div class="yes">✓ Use integrated features for workflow efficiency</div>
+                        <div class="no">✗ Assume custom AI requires technical expertise</div><div class="no">✗ Overlook built-in AI capabilities</div>
+                    </div>
+                    <button class="i-btn" onclick="showInfo(0)">i</button>
+                </div>
+            
+                <div class="slide">
+                    <div class="slide-emoji">💡</div>
+                    <div class="slide-title">Surface Implied Context</div>
+                    <div class="slide-items">
+                        <div class="yes">✓ Include background information explicitly</div><div class="yes">✓ State assumptions and constraints clearly</div>
+                        <div class="no">✗ Assume AI knows your situation</div><div class="no">✗ Leave out relevant details</div>
+                    </div>
+                    <button class="i-btn" onclick="showInfo(1)">i</button>
+                </div>
+            
+                <div class="slide">
+                    <div class="slide-emoji">📝</div>
+                    <div class="slide-title">Use Few-Shot Prompting</div>
+                    <div class="slide-items">
+                        <div class="yes">✓ Provide 2-3 relevant examples</div><div class="yes">✓ Include successful reference cases</div>
+                        <div class="no">✗ Expect perfect results with zero examples</div><div class="no">✗ Use irrelevant or poor examples</div>
+                    </div>
+                    <button class="i-btn" onclick="showInfo(2)">i</button>
+                </div>
+            
+                <div class="slide">
+                    <div class="slide-emoji">🔗</div>
+                    <div class="slide-title">Break Complex Tasks</div>
+                    <div class="slide-items">
+                        <div class="yes">✓ Divide tasks into manageable steps</div><div class="yes">✓ Review and refine each step</div>
+                        <div class="no">✗ Ask for everything at once</div><div class="no">✗ Skip intermediate review stages</div>
+                    </div>
+                    <button class="i-btn" onclick="showInfo(3)">i</button>
+                </div>
+            
+                <div class="slide">
+                    <div class="slide-emoji">⚠️</div>
+                    <div class="slide-title">Understand AI Limitations</div>
+                    <div class="slide-items">
+                        <div class="yes">✓ Verify facts for high-stakes decisions</div><div class="yes">✓ Recognize bias and data cutoffs</div>
+                        <div class="no">✗ Trust AI outputs blindly</div><div class="no">✗ Use AI for critical decisions without verification</div>
+                    </div>
+                    <button class="i-btn" onclick="showInfo(4)">i</button>
+                </div>
+            
 </div>
 <div class="dots" id="dots"></div>
 <div class="video">
-<iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen></iframe>
+<iframe src="https://www.youtube.com/embed/nVyD6THcvDQ" allowfullscreen></iframe>
 </div>
 <div class="badge" onclick="showItabs()">
 <span class="i-btn">i</span>
@@ -588,7 +109,7 @@ ${slides}
 <div class="popup-content" id="popupContent"></div>
 </div>
 <script>
-var infos=${infos};
+var infos=["<strong>Understanding AI Tool Categories</strong><br><br>Knowing the three types of AI tools helps you select the right solution for your specific needs. Standalone tools offer independence, integrated features provide seamless workflow enhancement, and custom solutions deliver specialized problem-solving capabilities.<br><br><strong>Quick tip:</strong> Start with standalone tools like ChatGPT, then explore integrated features in your existing software.<br><br><strong>Learn more:</strong> Search <em>AI tool comparison guide</em>","<strong>The Power of Complete Context</strong><br><br>AI tools can't read your mind or know your background like humans do. Providing complete context dramatically improves the quality and relevance of AI outputs by giving the model all necessary information to understand your specific situation.<br><br><strong>Quick tip:</strong> Before prompting, ask yourself 'What background does the AI need to know?'<br><br><strong>Learn more:</strong> Search <em>AI prompt engineering best practices</em>","<strong>Examples Drive Better Results</strong><br><br>Few-shot prompting with relevant examples helps AI understand the style, format, and quality you're seeking. The more specific and relevant your examples, the better the AI can replicate your desired output pattern.<br><br><strong>Quick tip:</strong> Collect 2-3 examples of what 'good' looks like before prompting the AI.<br><br><strong>Learn more:</strong> Search <em>few-shot prompting techniques</em>","<strong>Chain-of-Thought for Better Results</strong><br><br>Complex tasks like writing cover letters or creating presentations benefit from being broken into smaller, sequential steps. This approach helps AI maintain consistency and allows you to guide the process at each stage.<br><br><strong>Quick tip:</strong> Turn one big request into 3-4 smaller, sequential prompts.<br><br><strong>Learn more:</strong> Search <em>chain of thought prompting examples</em>","<strong>AI Has Real Limitations</strong><br><br>AI models can have biased training data, knowledge cutoffs, and may hallucinate incorrect information. Understanding these limitations helps you use AI tools more effectively and avoid costly mistakes in important situations.<br><br><strong>Quick tip:</strong> Always fact-check AI outputs for health, legal, or financial advice.<br><br><strong>Learn more:</strong> Search <em>AI hallucination prevention strategies</em>"];
 var itabsInfo="<strong>What is iTabs?</strong><br><br>iTabs transforms complex information into simple, interactive guides you can share anywhere.<br><br>✓ Created from YouTube videos in seconds<br>✓ Mobile-friendly design<br>✓ Clickable info buttons for deeper learning<br><br><a href='https://itabs.ai' target='_blank'>Learn more at itabs.ai →</a>";
 function showInfo(i){document.getElementById('popupContent').innerHTML=infos[i];document.getElementById('popup').classList.add('show');document.getElementById('overlay').classList.add('show')}
 function showItabs(){document.getElementById('popupContent').innerHTML=itabsInfo;document.getElementById('popup').classList.add('show');document.getElementById('overlay').classList.add('show')}
@@ -597,105 +118,5 @@ var slides=document.querySelectorAll('.slide');
 var dotsEl=document.getElementById('dots');
 slides.forEach(function(_,i){var d=document.createElement('div');d.className='dot'+(i===0?' active':'');dotsEl.appendChild(d)});
 document.getElementById('carousel').addEventListener('scroll',function(){var idx=Math.round(this.scrollLeft/this.offsetWidth);document.querySelectorAll('.dot').forEach(function(d,i){d.classList.toggle('active',i===idx)})});
-<\/script>
-</body></html>`;
-        }
-        
-        // List Style
-        function buildListStyle(c, vid, infos) {
-            const steps = c.steps.map((s, i) => `
-                <div class="step">
-                    <div class="step-header">
-                        <span class="emoji">${s.emoji}</span>
-                        <span class="title">${s.title}</span>
-                        <button class="i-btn" onclick="showInfo(${i})">i</button>
-                    </div>
-                    <div class="items">
-                        ${s.yes.map(y => `<div class="yes">✓ ${y}</div>`).join('')}
-                        ${s.no.map(n => `<div class="no">✗ ${n}</div>`).join('')}
-                    </div>
-                </div>
-            `).join('');
-
-            return `<!DOCTYPE html>
-<html><head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>${c.title}</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,sans-serif;background:transparent;margin:0;padding:0}
-.frame{max-width:400px;margin:0 auto;border:2px solid #e0e0e0;border-radius:16px;padding:16px;background:#f9f9f9}
-.card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
-h1{font-size:1.1rem;margin-bottom:14px;color:#333}
-.step{padding:12px 0;border-bottom:1px solid #eee}
-.step:last-child{border-bottom:none}
-.step-header{display:flex;align-items:center;gap:10px;margin-bottom:6px}
-.emoji{font-size:1.2rem;flex-shrink:0}
-.title{font-weight:600;color:#333;flex:1;font-size:0.95rem}
-.i-btn{width:26px;height:26px;background:#0066cc;color:#fff;border:none;border-radius:50%;font-size:13px;font-style:italic;font-family:Georgia,serif;cursor:pointer}
-.items{padding-left:32px}
-.yes{color:#228822;font-size:0.88rem;margin:4px 0}
-.no{color:#cc2222;font-size:0.88rem;margin:4px 0}
-.video{margin-top:14px;border-radius:10px;overflow:hidden}
-.video iframe{width:100%;aspect-ratio:16/9;border:none;display:block}
-.badge{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;padding:10px;font-size:0.8rem;color:#888;cursor:pointer}
-.badge .i-btn{width:18px;height:18px;font-size:10px}
-.overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:99}
-.overlay.show{display:block}
-.popup{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:24px;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.3);width:calc(100% - 48px);max-width:320px;max-height:75vh;overflow-y:auto;z-index:100}
-.popup.show{display:block}
-.popup-close{position:absolute;top:12px;right:12px;width:32px;height:32px;background:#f0f0f0;border:none;border-radius:50%;font-size:1.3rem;color:#666;cursor:pointer}
-.popup-content{font-size:0.95rem;line-height:1.7;color:#333}
-.popup-content strong{color:#0066cc;display:block;margin-top:12px}
-.popup-content strong:first-child{margin-top:0}
-.popup-content em{color:#0066cc}
-.popup-content a{color:#0066cc}
-</style>
-</head>
-<body>
-<div class="frame">
-<div class="card">
-<h1>${c.title}</h1>
-${steps}
-<div class="video">
-<iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen></iframe>
-</div>
-</div>
-<div class="badge" onclick="showItabs()">
-<span class="i-btn">i</span>
-<span>Made with iTabs</span>
-</div>
-</div>
-<div class="overlay" id="overlay" onclick="hideInfo()"></div>
-<div class="popup" id="popup">
-<button class="popup-close" onclick="hideInfo()">×</button>
-<div class="popup-content" id="popupContent"></div>
-</div>
-<script>
-var infos=${infos};
-var itabsInfo="<strong>What is iTabs?</strong><br><br>iTabs transforms complex information into simple, interactive guides you can share anywhere.<br><br>✓ Created from YouTube videos in seconds<br>✓ Mobile-friendly design<br>✓ Clickable info buttons for deeper learning<br><br><a href='https://itabs.ai' target='_blank'>Learn more at itabs.ai →</a>";
-function showInfo(i){document.getElementById('popupContent').innerHTML=infos[i];document.getElementById('popup').classList.add('show');document.getElementById('overlay').classList.add('show')}
-function showItabs(){document.getElementById('popupContent').innerHTML=itabsInfo;document.getElementById('popup').classList.add('show');document.getElementById('overlay').classList.add('show')}
-function hideInfo(){document.getElementById('popup').classList.remove('show');document.getElementById('overlay').classList.remove('show')}
-<\/script>
-</body></html>`;
-        }
-        
-        // Reset to form
-        function reset() {
-            showSection('formSection');
-        }
-        
-        // Copy code
-        function copyCode() {
-            const code = document.getElementById('codeBox').value;
-            navigator.clipboard.writeText(code).then(() => {
-                const btns = document.querySelectorAll('.output-actions .btn');
-                btns[1].textContent = '✓ Copied!';
-                setTimeout(() => btns[1].textContent = 'Copy HTML', 2000);
-            });
-        }
-    </script>
-</body>
-</html>
+</script>
+</body></html>
